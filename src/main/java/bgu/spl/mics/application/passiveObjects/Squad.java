@@ -43,11 +43,8 @@ public class Squad {//m
 	 * Releases agents.
 	 */
 	public void releaseAgents(List<String> serials){
-		synchronized (agents) {//TODO check this prev we did sync on all the function
-			for (Agent agent : this.agents.values()) {
-				agent.release();
-			}
-			notifyAll();
+		for (Agent agent : this.agents.values()) {
+			agent.release();
 		}
 	}
 
@@ -56,21 +53,12 @@ public class Squad {//m
 	 * @param time   time ticks to sleep
 	 */
 	public void sendAgents(List<String> serials, int time){
-		for (String s : serials) {
-			Agent a=agents.get(s);
-				a.acquire();
-		}
-
 		try {
 			Thread.sleep((long)time);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
-		for (String s : serials) {
-			Agent a=agents.get(s);
-				a.release();
-		}
+		releaseAgents(serials);
 	}
 
 	/**
@@ -78,27 +66,21 @@ public class Squad {//m
 	 * @param serials   the serial numbers of the agents
 	 * @return ‘false’ if an agent of serialNumber ‘serial’ is missing, and ‘true’ otherwise
 	 */
-	public synchronized boolean getAgents(List<String> serials){
-		boolean missing=false;
-		for (String id: serials) 
+	public boolean getAgents(List<String> serials){//sort the
+		serials.sort((String::compareTo));//important we sync per agent so we want all the threads access in the same order
+		for (String id: serials)
 		{
-			if(this.agents.containsKey(id)) 
+			if(!this.agents.containsKey(id))
 			{
-				Agent agent = this.agents.get(id);
-				while(!agent.isAvailable())
-				{
-					try {
-						wait();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-				agent.acquire();
+				return false;
 			}
-			else
-				return true;
 		}
-		return missing;
+		for (String id: serials)//separated so we dont acquire anyone if someone is missing
+		{
+			Agent agent = this.agents.get(id);
+			agent.acquire();//we wait inside agent
+		}
+		return true;
 	}
 
 	/**

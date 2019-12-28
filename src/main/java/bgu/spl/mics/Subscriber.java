@@ -118,11 +118,12 @@ public abstract class Subscriber extends RunnableSubPub {
 	@Override
 	public final void run() {
 		mb.register(this);
-		subscribeBroadcast(TerminationEvent.class,message->{
+		/*subscribeBroadcast(TerminationEvent.class,message->{
 			System.out.println("terrrrrr");
 			mb.unregister(this);
 			terminate();
-		});
+		});*/
+		//TODO delete this , we must do it in the init and the call back is unique!
 		initialize();
 		Message m=null;
 		while (!terminated)

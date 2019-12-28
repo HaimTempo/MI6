@@ -32,7 +32,7 @@ public class Future<T> {
 	 */
 	public synchronized T get() {
 		try {
-			if(!isDone()) 
+			while(!isDone())
 			{
 				this.wait();
 			}
@@ -74,7 +74,7 @@ public class Future<T> {
 	public synchronized T get(long timeout, TimeUnit unit) {
 		try 
 		{
-			if(!isDone()) {
+			if (!isDone()) {//TODO this is right but - check
 				unit.timedWait(this ,timeout);
 			}
 			return result;

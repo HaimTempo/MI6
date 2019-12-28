@@ -3,6 +3,7 @@ package bgu.spl.mics.application.subscribers;
 import bgu.spl.mics.application.messages.GadgetAvailableEvent;
 import bgu.spl.mics.application.messages.GadgetAvailableEventData;
 import bgu.spl.mics.Subscriber;
+import bgu.spl.mics.application.messages.TerminationEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.Inventory;
 
@@ -41,7 +42,14 @@ public class Q extends Subscriber {
 			String gadget_to_check = answer.getGadget();
 			boolean exists=getItem(gadget_to_check);
 			GadgetAvailableEventData data;
-			
+
+			subscribeBroadcast(TerminationEvent.class, message->{
+				//TODO we have to release all the agents before we terminate - add a list of all the agents we handaled last time and just release all of them
+				mb.unregister(this);
+				terminate();
+				System.out.println(getName()+" terminated");
+			});
+
 			if(exists)
 			{
 				data = new GadgetAvailableEventData(true, qtime);

@@ -7,6 +7,7 @@ import bgu.spl.mics.MessageBroker;
 import bgu.spl.mics.MessageBrokerImpl;
 import bgu.spl.mics.Subscriber;
 import bgu.spl.mics.application.messages.MissionReceivedEvent;
+import bgu.spl.mics.application.messages.TerminationEvent;
 import bgu.spl.mics.application.messages.TickBroadcast;
 import bgu.spl.mics.application.passiveObjects.MissionInfo;
 
@@ -39,6 +40,12 @@ public class Intelligence extends Subscriber {
 	@Override
 	protected void initialize() {
 		System.out.println("Intelligence init");
+		subscribeBroadcast(TerminationEvent.class, message->{
+			//TODO
+			mb.unregister(this);
+			terminate();
+			System.out.println(getName()+" terminated");
+		});
 		this.subscribeBroadcast(TickBroadcast.class,message -> {
 			System.out.println("Intelligence reseved info");
 			int time = message.getCurrentTime();

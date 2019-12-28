@@ -2,13 +2,10 @@ package bgu.spl.mics.application.subscribers;
 
 import java.util.List;
 import bgu.spl.mics.Callback;
-import bgu.spl.mics.application.messages.AgentAvailbleData;
-import bgu.spl.mics.application.messages.AgentsAvailableEvent;
+import bgu.spl.mics.application.messages.*;
 import bgu.spl.mics.Subscriber;
-import bgu.spl.mics.application.messages.ReleaseAgentsEvent;
 import bgu.spl.mics.application.passiveObjects.Agent;
 import bgu.spl.mics.application.passiveObjects.Squad;
-import bgu.spl.mics.application.messages.SendAgentsEvent;
 
 /**
  * Only this type of Subscriber can access the squad.
@@ -70,6 +67,14 @@ public class Moneypenny extends Subscriber {
 				complete(message,true);//release agents doesn't needs an answer??
 			});
 		}
+
+		subscribeBroadcast(TerminationEvent.class, message->{
+			//TODO we have to release all the agents before we terminate - add a list of all the agents we handaled last time and just release all of them
+			mb.unregister(this);//todo fix this
+			terminate();
+			System.out.println(getName()+" terminated");
+		});
+
 
 		subscribeEvent(SendAgentsEvent.class, new Callback<SendAgentsEvent>() {
 			@Override

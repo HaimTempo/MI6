@@ -37,6 +37,12 @@ public class M extends Subscriber {
 	@Override
 	protected void initialize(){
 		//Updates the current time.
+		subscribeBroadcast(TerminationEvent.class, message->{
+			//TODO we need to clear something?
+			mb.unregister(this);
+			terminate();
+			System.out.println(getName()+" terminated");
+		});
 		this.subscribeBroadcast(TickBroadcast.class,message -> {
 			this.time =message.getCurrentTime();
 		});
